@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<net.bingyan.hustpass.widget.SquareLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<net.bingyan.campass.view.SquareLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fff"
+    android:background="@drawable/home_btn_bg"
     android:gravity="center">
 
     <LinearLayout
@@ -27,4 +27,4 @@
 
     </LinearLayout>
 
-</net.bingyan.hustpass.widget.SquareLayout>
+</net.bingyan.campass.view.SquareLayout>

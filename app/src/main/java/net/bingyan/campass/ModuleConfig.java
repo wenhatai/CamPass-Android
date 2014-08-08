@@ -1,4 +1,4 @@
-package main.java.net.bingyan.campass;
+package net.bingyan.campass;
 
 import android.content.Context;
 
@@ -24,6 +24,8 @@ public class ModuleConfig {
             null,null, null,
             null, null, null,
             null, null,null};
+
+
     public static List<Module> initModuleDao(Context context, ModuleDao moduleDao) {
         for (int i = 0; i < moduleNameRes.length; i++) {
             Module module = new Module();
@@ -38,4 +40,10 @@ public class ModuleConfig {
                 orderDesc(ModuleDao.Properties.Frequency).
                 list();
     }
+    public static void updateModuleName(Module module){
+        if(module.getClassname()==""&&moduleClassName[module.getId().intValue()-1]!=null){
+            module.setClassname(moduleClassName[module.getId().intValue()-1]);
+        }
+    }
+
 }

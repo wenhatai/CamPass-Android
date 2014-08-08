@@ -19,8 +19,8 @@ import net.bingyan.campass.R;
 
 import java.util.List;
 
-import main.java.net.bingyan.campass.ModuleConfig;
-import main.java.net.bingyan.campass.MyApplication;
+import net.bingyan.campass.ModuleConfig;
+import net.bingyan.campass.MyApplication;
 
 public class HomeActivity extends Activity {
 
@@ -44,6 +44,7 @@ public class HomeActivity extends Activity {
         if (modules.isEmpty()) {
             modules = ModuleConfig.initModuleDao(this, moduleDao);
         }
+
 
         GridView gridView = (GridView) findViewById(R.id.home_gridview);
         gridView.setNumColumns(3);
@@ -105,6 +106,7 @@ public class HomeActivity extends Activity {
             //update module frequency
             Module module = modules.get(i);
             module.setFrequency(module.getFrequency() + 1);
+            ModuleConfig.updateModuleName(module);
             moduleDao.update(module);
 
             String n = module.getClassname();
