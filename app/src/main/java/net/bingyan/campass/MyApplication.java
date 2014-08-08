@@ -1,4 +1,4 @@
-package main.java.net.bingyan.campass;
+package net.bingyan.campass;
 
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;

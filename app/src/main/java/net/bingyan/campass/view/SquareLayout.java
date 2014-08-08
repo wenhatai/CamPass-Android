@@ -1,4 +1,4 @@
-package main.java.net.bingyan.campass.view;
+package net.bingyan.campass.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -1,4 +1,4 @@
-package main.java.net.bingyan.campass.rest;
+package net.bingyan.campass.rest;
 
 import retrofit.RestAdapter;
 
