@@ -1,4 +1,4 @@
-package main.java.net.bingyan.campass.rest;
+package net.bingyan.campass.rest;
 
 import android.app.Application;
 
@@ -9,7 +9,7 @@ import net.bingyan.campass.CacheDao;
 
 import java.util.Date;
 
-import main.java.net.bingyan.campass.MyApplication;
+import net.bingyan.campass.MyApplication;
 
 /**
  * Created by ant on 14-8-8.
