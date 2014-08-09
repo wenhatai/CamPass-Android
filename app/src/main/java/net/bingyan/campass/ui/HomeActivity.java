@@ -19,13 +19,8 @@ import net.bingyan.campass.R;
 
 import java.util.List;
 
-<<<<<<< HEAD
 import net.bingyan.campass.MyApplication;
 import net.bingyan.campass.ModuleConfig;
-=======
-import net.bingyan.campass.ModuleConfig;
-import net.bingyan.campass.MyApplication;
->>>>>>> upstream/master
 
 public class HomeActivity extends Activity {
 

@@ -19,4 +19,10 @@
     <string name="module_news">新闻</string>
     <string name="module_score">成绩</string>
     <string name="module_wifi">校园网</string>
+
+    <!-- Electric strings -->
+    <string name="title_activity_electric">Electric</string>
+    <string name="electric_remain">剩余电量</string>
+    <string name="electric_query">查询</string>
+
 </resources>
