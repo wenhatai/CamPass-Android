@@ -5,6 +5,7 @@ import android.content.Context;
 import net.bingyan.campass.Module;
 import net.bingyan.campass.ModuleDao;
 import net.bingyan.campass.R;
+import net.bingyan.campass.module.news.NewsListActivity;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ModuleConfig {
     static String moduleClassName[] = {null, null, null,
             null,null, null,
             null, null, null,
-            null, null,null};
+            NewsListActivity.class.getName(), null,null};
 
 
     public static List<Module> initModuleDao(Context context, ModuleDao moduleDao) {
