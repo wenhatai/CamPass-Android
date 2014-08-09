@@ -1,5 +1,7 @@
 package net.bingyan.campass.rest;
 
+import net.bingyan.campass.module.electric.ElectricJson;
+
 import java.util.Map;
 
 import retrofit.Callback;

@@ -1,4 +1,4 @@
-package net.bingyan.campass.rest;
+package net.bingyan.campass.module.electric;
 
 import java.util.ArrayList;
 import java.util.List;

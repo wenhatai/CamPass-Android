@@ -1,4 +1,4 @@
-package net.bingyan.campass.ui;
+package net.bingyan.campass.module.electric;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,7 +20,6 @@ import net.bingyan.campass.MyApplication;
 import net.bingyan.campass.R;
 import net.bingyan.campass.rest.API;
 import net.bingyan.campass.rest.CacheDaoHelper;
-import net.bingyan.campass.rest.ElectricJson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,6 +52,8 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
     private String areaStr;
     private int buildingNum;
     private int dormNum;
+    private Date recentDate;
+    private float remain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +70,10 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
     private void init() {
         initView();
 
+        //先展示数据库中的数据
         display();
+        //再从网络请求
+        getFromWeb();
     }
 
     private void initView() {
@@ -98,13 +102,18 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
 
     }
 
-    private void getFromWeb(Map<String, String> options) {
+    private void getFromWeb() {
+        Map<String, String> options = new HashMap<String, String>();
+        options.put("quyu", areaStr);
+        options.put("loudong", building.getText().toString());
+        options.put("fangjian", dorm.getText().toString());
+
         RestAdapter rest = new RestAdapter.Builder().setEndpoint(URL).build();
         API.ElectricService test = rest.create(API.ElectricService.class);
         test.getElectricJson(options, new Callback<ElectricJson>() {
             @Override
             public void success(ElectricJson electricJson, Response response) {
-                Log.e("dianfei", electricJson.toString());
+                Log.i("dianfei", electricJson.toString());
                 saveAndDiaplay(electricJson);
             }
 
@@ -132,28 +141,7 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
         //从数据库到显示出来的转换
         SimpleDateFormat listFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        //查询当前有的数据
-        QueryBuilder queryBuilder = electricRecordDao.queryBuilder();
-        queryBuilder.where(ElectricRecordDao.Properties.Area.eq(areaStr),
-                queryBuilder.and(ElectricRecordDao.Properties.Building.eq(buildingNum),
-                        ElectricRecordDao.Properties.Dorm.eq(dormNum))
-        );
-        List list = queryBuilder.list();
-
-        //先将数据库中的数据加到List中
-        dateList.clear();
-        remainList.clear();
-        for (Object aList : list) {
-            Log.i("list", aList.toString());
-            ElectricRecord record = (ElectricRecord) aList;
-            dateList.add(listFormat.format(record.getDate()));
-            remainList.add(record.getRemain());
-        }
-
-        //数据库中最后缓存的日期
-        Date recentDate = list.size() == 0 ? null : ((ElectricRecord) list.get(0)).getDate();
-        Log.i("recent", list.size() + "  ");
-
+        int i = 0;
         for (List<String> history : electricJson.getHistory()) {
             Date date = null;
             try {
@@ -175,8 +163,8 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
             electricRecordDao.insertOrReplace(electricRecord);
 
             //将数据库中没有的数据加到List中
-            dateList.add(listFormat.format(date));
-            remainList.add(Float.valueOf(history.get(0)));
+            dateList.add(i, listFormat.format(date));
+            remainList.add(i ++, Float.valueOf(history.get(0)));
         }
         myListAdapter.notifyDataSetInvalidated();
     }
@@ -187,10 +175,14 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
         QueryBuilder queryBuilder = electricRecordDao.queryBuilder();
         queryBuilder.where(ElectricRecordDao.Properties.Area.eq(areaStr),
                 queryBuilder.and(ElectricRecordDao.Properties.Building.eq(buildingNum),
-                        ElectricRecordDao.Properties.Dorm.eq(dormNum))
-        );
+                        ElectricRecordDao.Properties.Dorm.eq(dormNum)))
+                .orderDesc(ElectricRecordDao.Properties.Date);
         List list = queryBuilder.list();
-        Log.i("list", list.size() + "");
+        //数据库中最后缓存的日期
+        recentDate = list.size() == 0 ? null : ((ElectricRecord) list.get(0)).getDate();
+        remain = list.size() == 0 ? 0 : ((ElectricRecord) list.get(0)).getRemain();
+        TextView remainText = (TextView)findViewById(R.id.electric_remain);
+        remainText.setText(String.valueOf(remain));
 
         dateList.clear();
         remainList.clear();
@@ -214,11 +206,7 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
                 //先展示数据库中的数据
                 display();
                 //再从网络请求
-                Map<String, String> options = new HashMap<String, String>();
-                options.put("quyu", areaStr);
-                options.put("loudong", building.getText().toString());
-                options.put("fangjian", dorm.getText().toString());
-                getFromWeb(options);
+                getFromWeb();
                 break;
         }
     }

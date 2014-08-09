@@ -2,7 +2,7 @@ package net.bingyan.campass;
 
 import android.content.Context;
 
-import net.bingyan.campass.ui.ElectricActivity;
+import net.bingyan.campass.module.electric.ElectricActivity;
 
 import java.util.List;
 

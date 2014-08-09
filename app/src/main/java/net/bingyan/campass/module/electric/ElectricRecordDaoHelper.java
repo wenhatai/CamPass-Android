@@ -1,4 +1,4 @@
-package net.bingyan.campass.rest;
+package net.bingyan.campass.module.electric;
 
 import net.bingyan.campass.ElectricRecordDao;
 import net.bingyan.campass.MyApplication;
