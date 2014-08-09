@@ -2,9 +2,7 @@ package net.bingyan.campass;
 
 import android.content.Context;
 
-import net.bingyan.campass.Module;
-import net.bingyan.campass.ModuleDao;
-import net.bingyan.campass.R;
+import net.bingyan.campass.module.electric.ElectricActivity;
 import net.bingyan.campass.module.news.NewsListActivity;
 
 import java.util.List;
@@ -22,9 +20,9 @@ public class ModuleConfig {
             R.drawable.home_icon_lecture, R.drawable.home_icon_lib, R.drawable.home_icon_map,
             R.drawable.home_icon_news, R.drawable.home_icon_score, R.drawable.home_icon_wifi};
     static String moduleClassName[] = {null, null, null,
-            null,null, null,
+            ElectricActivity.class.getName(), null, null,
             null, null, null,
-            NewsListActivity.class.getName(), null,null};
+            NewsListActivity.class.getName(), null, null};
 
 
     public static List<Module> initModuleDao(Context context, ModuleDao moduleDao) {
@@ -33,7 +31,7 @@ public class ModuleConfig {
             module.setIconid(moduleIconRes[i]);
             module.setName(context.getString(moduleNameRes[i]));
             module.setFrequency(0);
-            if(moduleClassName[i]==null) moduleClassName[i]="";
+            if (moduleClassName[i] == null) moduleClassName[i] = "";
             module.setClassname(moduleClassName[i]);
             moduleDao.insert(module);
         }
@@ -41,9 +39,10 @@ public class ModuleConfig {
                 orderDesc(ModuleDao.Properties.Frequency).
                 list();
     }
-    public static void updateModuleName(Module module){
-        if(module.getClassname()==""&&moduleClassName[module.getId().intValue()-1]!=null){
-            module.setClassname(moduleClassName[module.getId().intValue()-1]);
+
+    public static void updateModuleName(Module module) {
+        if (module.getClassname().equals("") && moduleClassName[module.getId().intValue() - 1] != null) {
+            module.setClassname(moduleClassName[module.getId().intValue() - 1]);
         }
     }
 

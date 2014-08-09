@@ -19,8 +19,8 @@ import net.bingyan.campass.R;
 
 import java.util.List;
 
-import net.bingyan.campass.ModuleConfig;
 import net.bingyan.campass.MyApplication;
+import net.bingyan.campass.ModuleConfig;
 
 public class HomeActivity extends BaseActivity {
 
@@ -110,7 +110,7 @@ public class HomeActivity extends BaseActivity {
             moduleDao.update(module);
 
             String n = module.getClassname();
-            if(n=="") return;
+            if(n.equals("")) return;
             try {
                 Intent intent = new Intent();
                 intent.setClass(HomeActivity.this, Class.forName(n));

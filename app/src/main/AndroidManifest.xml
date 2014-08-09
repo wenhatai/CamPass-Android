@@ -3,18 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="net.bingyan.campass" >
 
+
     <uses-sdk tools:node="replace" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:name=".MyApplication"
-        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".ui.HomeActivity"
-            android:label="@string/app_name" >
+            android:label="@string/title_activity_home" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,6 +28,10 @@
         <activity
             android:name=".module.news.NewsListActivity"
             android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".module.electric.ElectricActivity"
+            android:label="@string/title_activity_electric" >
         </activity>
     </application>
 
