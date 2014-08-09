@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.ElectricActivity"
+            android:name=".module.electric.ElectricActivity"
             android:label="@string/title_activity_electric" >
         </activity>
     </application>
