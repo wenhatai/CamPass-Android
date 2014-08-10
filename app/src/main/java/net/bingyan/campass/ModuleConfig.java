@@ -3,6 +3,7 @@ package net.bingyan.campass;
 import android.content.Context;
 
 import net.bingyan.campass.module.electric.ElectricActivity;
+import net.bingyan.campass.module.news.NewsListActivity;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class ModuleConfig {
     static String moduleClassName[] = {null, null, null,
             ElectricActivity.class.getName(), null, null,
             null, null, null,
-            null, null, null};
+            NewsListActivity.class.getName(), null, null};
 
 
     public static List<Module> initModuleDao(Context context, ModuleDao moduleDao) {
