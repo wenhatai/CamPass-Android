@@ -22,7 +22,7 @@ import java.util.List;
 import net.bingyan.campass.MyApplication;
 import net.bingyan.campass.ModuleConfig;
 
-public class HomeActivity extends Activity {
+public class HomeActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

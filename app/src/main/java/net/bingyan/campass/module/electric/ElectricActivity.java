@@ -1,9 +1,7 @@
 package net.bingyan.campass.module.electric;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -19,40 +17,36 @@ import net.bingyan.campass.ElectricRecordDao;
 import net.bingyan.campass.MyApplication;
 import net.bingyan.campass.R;
 import net.bingyan.campass.rest.API;
-import net.bingyan.campass.rest.CacheDaoHelper;
+import net.bingyan.campass.rest.RestHelper;
+import net.bingyan.campass.ui.BaseActivity;
+import net.bingyan.campass.util.AppLog;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.greenrobot.dao.query.QueryBuilder;
 import retrofit.Callback;
-import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class ElectricActivity extends Activity implements View.OnClickListener {
+public class ElectricActivity extends BaseActivity implements View.OnClickListener {
 
-    public static String URL = "http://202.114.18.13:9093";
+    AppLog mLog = new AppLog(getClass());
 
-    public static String[] AREA = {"韵苑", "紫菘", "东区", "西区"};
+    private API.ElectricService service;
 
-    private List<String> dateList;
-    private List<Float> remainList;
-    private MyListAdapter myListAdapter;
-
+    //View
     private Spinner area;
     private EditText building;
     private EditText dorm;
-    //校区
+    private MyListAdapter myListAdapter;
+
+    //校区、楼栋、寝室号
     private String areaStr;
-    //楼栋
     private int buildingNum;
-    //寝室号
     private int dormNum;
     //数据库中最近一次的日期
     private Date recentDate;
@@ -62,9 +56,7 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_electric);
 
-        dateList = new ArrayList<String>();
-        remainList = new ArrayList<Float>();
-
+        service = RestHelper.getService(API.ElectricService.HOST, API.ElectricService.class);
         init();
     }
 
@@ -77,61 +69,50 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
     }
 
     private void initView() {
+        //电费的列表
         ListView recordList = (ListView) findViewById(R.id.record_list);
         myListAdapter = new MyListAdapter(this);
         recordList.setAdapter(myListAdapter);
 
+        //初始化Spinner
         area = (Spinner) findViewById(R.id.electric_loc_area);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_spinner_item, AREA);
+                this, android.R.layout.simple_spinner_item, API.ElectricService.AREA);
         area.setAdapter(spinnerAdapter);
 
+        //填写寝室地址
         building = (EditText) findViewById(R.id.electric_loc_building);
         dorm = (EditText) findViewById(R.id.electric_loc_dorm);
 
         //初始时默认的寝室，应该是从sharePreference中获取
-        areaStr = AREA[0];
+        areaStr = API.ElectricService.AREA[0];
         buildingNum = 15;
         dormNum = 306;
         area.setSelection(0);
         building.setText(String.valueOf(buildingNum));
         dorm.setText(String.valueOf(dormNum));
 
-        Button setLoc = (Button) findViewById(R.id.electric_query);
-        setLoc.setOnClickListener(this);
+        //查询按钮
+        Button query = (Button) findViewById(R.id.electric_query);
+        query.setOnClickListener(this);
 
     }
 
     private void getFromWeb() {
-        Map<String, String> options = new HashMap<String, String>();
-        options.put("quyu", areaStr);
-        options.put("loudong", String.valueOf(buildingNum));
-        options.put("fangjian", String.valueOf(dormNum));
-
-        RestAdapter rest = new RestAdapter.Builder().setEndpoint(URL).build();
-        API.ElectricService test = rest.create(API.ElectricService.class);
-        test.getElectricJson(options, new Callback<ElectricBean>() {
+        service.getElectricJson(areaStr, buildingNum, dormNum, new Callback<ElectricBean>() {
             @Override
             public void success(ElectricBean electricJson, Response response) {
-                Log.i("dianfei", electricJson.toString());
-                saveAndDiaplay(electricJson);
+                saveAndDisplay(electricJson);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                Log.e("error", error.toString());
+                mLog.i(error.toString());
             }
         });
     }
 
-    public void saveAndDiaplay(ElectricBean electricJson) {
-        //如果是绑定的寝室，则缓存json。也可以不用缓存json，因为电费已经做了缓存
-        if(areaStr.equals("韵苑") && buildingNum == 15 && dormNum == 306) {
-            CacheDaoHelper cacheDaoHelper = new CacheDaoHelper(
-                    (MyApplication) this.getApplicationContext());
-            cacheDaoHelper.putCache(electricJson);
-        }
-
+    public void saveAndDisplay(ElectricBean electricJson) {
         ElectricRecordDao electricRecordDao = ((MyApplication) this.getApplicationContext())
                 .getDaoSession().getElectricRecordDao();
         ElectricRecord electricRecord;
@@ -160,12 +141,18 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
             electricRecord.setDorm(dormNum);
             electricRecord.setRemain(Float.valueOf(history.get(0)));
             electricRecord.setDate(date);
+            //插入到数据库
             electricRecordDao.insertOrReplace(electricRecord);
 
             //将数据库中没有的数据加到List中
-            dateList.add(i, listFormat.format(date));
-            remainList.add(i ++, Float.valueOf(history.get(0)));
+            myListAdapter.dateList.add(i, listFormat.format(date));
+            myListAdapter.remainList.add(i ++, Float.valueOf(history.get(0)));
         }
+        //更新剩余电量
+        float remain = myListAdapter.remainList.size() == 0 ? 0 : myListAdapter.remainList.get(0);
+        TextView remainText = (TextView)findViewById(R.id.electric_remain);
+        remainText.setText(String.valueOf(remain));
+        //刷新电费列表
         myListAdapter.notifyDataSetInvalidated();
     }
 
@@ -178,21 +165,21 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
                         ElectricRecordDao.Properties.Dorm.eq(dormNum)))
                 .orderDesc(ElectricRecordDao.Properties.Date);
         List list = queryBuilder.list();
-        //数据库中最后缓存的日期
+        //数据库中最后缓存的日期和剩余电量
         recentDate = list.size() == 0 ? null : ((ElectricRecord) list.get(0)).getDate();
         float remain = list.size() == 0 ? 0 : ((ElectricRecord) list.get(0)).getRemain();
         TextView remainText = (TextView)findViewById(R.id.electric_remain);
         remainText.setText(String.valueOf(remain));
 
-        dateList.clear();
-        remainList.clear();
+        //先清空电费列表
+        myListAdapter.clear();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         for (Object aList : list) {
-            Log.i("list", aList.toString());
             ElectricRecord record = (ElectricRecord) aList;
-            dateList.add(simpleDateFormat.format(record.getDate()));
-            remainList.add(record.getRemain());
+            myListAdapter.dateList.add(simpleDateFormat.format(record.getDate()));
+            myListAdapter.remainList.add(record.getRemain());
         }
+        //刷新电费列表
         myListAdapter.notifyDataSetInvalidated();
     }
 
@@ -214,9 +201,18 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
     class MyListAdapter extends BaseAdapter {
 
         private Context context;
+        private List<String> dateList;
+        private List<Float> remainList;
 
         public MyListAdapter(Context context) {
             this.context = context;
+            dateList = new ArrayList<String>();
+            remainList = new ArrayList<Float>();
+        }
+
+        public void clear() {
+            dateList.clear();
+            remainList.clear();
         }
 
         @Override
