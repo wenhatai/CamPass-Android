@@ -1,6 +1,6 @@
 package net.bingyan.campass.rest;
 
-import net.bingyan.campass.module.electric.ElectricJson;
+import net.bingyan.campass.module.electric.ElectricBean;
 
 import java.util.Map;
 
@@ -16,6 +16,6 @@ public class API {
         @GET("/check_dianfei")
         void getElectricJson(
                 @QueryMap Map<String, String> options,
-                Callback<ElectricJson> cb);
+                Callback<ElectricBean> cb);
     }
 }

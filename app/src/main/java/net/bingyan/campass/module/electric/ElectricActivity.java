@@ -48,12 +48,14 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
     private Spinner area;
     private EditText building;
     private EditText dorm;
-
+    //校区
     private String areaStr;
+    //楼栋
     private int buildingNum;
+    //寝室号
     private int dormNum;
+    //数据库中最近一次的日期
     private Date recentDate;
-    private float remain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +66,10 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
         remainList = new ArrayList<Float>();
 
         init();
-
     }
 
     private void init() {
         initView();
-
         //先展示数据库中的数据
         display();
         //再从网络请求
@@ -105,14 +105,14 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
     private void getFromWeb() {
         Map<String, String> options = new HashMap<String, String>();
         options.put("quyu", areaStr);
-        options.put("loudong", building.getText().toString());
-        options.put("fangjian", dorm.getText().toString());
+        options.put("loudong", String.valueOf(buildingNum));
+        options.put("fangjian", String.valueOf(dormNum));
 
         RestAdapter rest = new RestAdapter.Builder().setEndpoint(URL).build();
         API.ElectricService test = rest.create(API.ElectricService.class);
-        test.getElectricJson(options, new Callback<ElectricJson>() {
+        test.getElectricJson(options, new Callback<ElectricBean>() {
             @Override
-            public void success(ElectricJson electricJson, Response response) {
+            public void success(ElectricBean electricJson, Response response) {
                 Log.i("dianfei", electricJson.toString());
                 saveAndDiaplay(electricJson);
             }
@@ -124,7 +124,7 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
         });
     }
 
-    public void saveAndDiaplay(ElectricJson electricJson) {
+    public void saveAndDiaplay(ElectricBean electricJson) {
         //如果是绑定的寝室，则缓存json。也可以不用缓存json，因为电费已经做了缓存
         if(areaStr.equals("韵苑") && buildingNum == 15 && dormNum == 306) {
             CacheDaoHelper cacheDaoHelper = new CacheDaoHelper(
@@ -180,7 +180,7 @@ public class ElectricActivity extends Activity implements View.OnClickListener {
         List list = queryBuilder.list();
         //数据库中最后缓存的日期
         recentDate = list.size() == 0 ? null : ((ElectricRecord) list.get(0)).getDate();
-        remain = list.size() == 0 ? 0 : ((ElectricRecord) list.get(0)).getRemain();
+        float remain = list.size() == 0 ? 0 : ((ElectricRecord) list.get(0)).getRemain();
         TextView remainText = (TextView)findViewById(R.id.electric_remain);
         remainText.setText(String.valueOf(remain));
 

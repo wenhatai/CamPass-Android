@@ -65,7 +65,7 @@ public class CacheDaoHelper {
         newsListCache.setName(t.getClass().getName());
         newsListCache.setJson(new Gson().toJson(t));
         newsListCache.setDate(new Date());
-        getCacheDao().update(newsListCache);
+        getCacheDao().insertOrReplace(newsListCache);
     }
 
     public <T> void putCache(T t,String tag) {
@@ -73,6 +73,6 @@ public class CacheDaoHelper {
         newsListCache.setName(t.getClass().getName()+tag);
         newsListCache.setJson(new Gson().toJson(t));
         newsListCache.setDate(new Date());
-        getCacheDao().update(newsListCache);
+        getCacheDao().insertOrReplace(newsListCache);
     }
 }
