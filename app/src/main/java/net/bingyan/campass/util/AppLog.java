@@ -17,12 +17,19 @@ public class AppLog {
     public static final int MaxLength = 4000;
 
     public static final int Debug = 1;
-    public static final int Info = 2;
-    public static final int Warn = 3;
-    public static final int Error = 4;
+    public static final int Verbose = 2;
+    public static final int Info = 3;
+    public static final int Warn = 4;
+    public static final int Error = 5;
 
     public <T> AppLog(Class<T> class1) {
         mTag = class1.getCanonicalName();
+    }
+
+    public static void v(String msg) {
+        if (!debug || TextUtils.isEmpty(msg))
+            return;
+        logMessage(msg, Verbose);
     }
 
     public static void d(String msg) {
@@ -69,6 +76,9 @@ public class AppLog {
             int end = (i + 1) * MaxLength;
             end = end > msg.length() ? msg.length() : end;
             switch (method) {
+                case Verbose:
+                    Log.v(mTag,msg.substring(start,end));
+                    break;
                 case Warn:
                     Log.w(mTag, msg.substring(start, end));
                     break;
